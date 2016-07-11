@@ -9,13 +9,26 @@
 namespace Syllable\Hooks;
 
 
+use Syllable\Cache\SyllableCacheAdapter;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class Render
 {
     // TODO this should be in configuration
     private $minLettersBefore = 4;
     private $minLettersAfter = 4;
+
+    /**
+     * @var ObjectManager
+     */
+    private $objectManager;
+
+    public function __construct()
+    {
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+    }
 
     public function renderPostProcess(&$parts)
     {
@@ -50,10 +63,9 @@ class Render
 
         $syllable = new \Syllable($lang);
 
-        // TODO caching should be handled though the typo3 cache, write an adapter
-        $cacheDir = GeneralUtility::getFileAbsFileName('typo3temp/syllable');
-        GeneralUtility::mkdir($cacheDir);
-        $syllable->setCache(new \Syllable_Cache_Serialized($cacheDir));
+        /** @var CacheManager $cacheManager */
+        $cacheManager = $this->objectManager->get(CacheManager::class);
+        $syllable->setCache(new SyllableCacheAdapter($cacheManager->getCache('syllable')));
 
         $htmlExpression = '#(<(?:[pbisa]|h\d|div|li|strong)[^>]*>)([^<]+)(?=<)#is';
         $parts['bodyContent'] = preg_replace_callback($htmlExpression, function ($groups) use ($syllable) {
