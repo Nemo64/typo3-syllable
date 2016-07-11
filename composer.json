@@ -1,0 +1,18 @@
+{
+    "name": "nemo64/syllable",
+    "type": "typo3-cms-extension",
+    "authors": [
+        {
+            "name": "Marco Pfeiffer",
+            "email": "git@marco.zone"
+        }
+    ],
+    "require": {
+        "vanderlee/syllable": "~1.4.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Syllable\\": "Classes"
+        }
+    }
+}
